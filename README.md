@@ -10,8 +10,10 @@ go get ./...
 3. configure the network and the lookup key at each script
 ```go
 // at ./dht-crawler/crawler.go or ./dht-lookup/lookup.go  
-celestiaNet := commons.Mocha      // "commons.Mainnet" or "commons.Arabica" or "commons.Mocha"
-recordKey := commons.ArchivalNode // "commons.ArchivalNode" or "commons.ArchivalNode"
+// "commons.Mainnet" or "commons.Arabica" or "commons.Mocha"
+celestiaNet := commons.Mocha      
+// "commons.ArchivalNode" or "commons.ArchivalNode"
+recordKey := commons.ArchivalNode
 ```
 
 ## running the crawler
