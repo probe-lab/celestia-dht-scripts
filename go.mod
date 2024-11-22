@@ -1,6 +1,6 @@
 module github.com/probe-lab/celestia-dht-scripts
 
-go 1.22.2
+go 1.22
 
 require (
 	github.com/ipfs/go-cid v0.4.1
@@ -8,6 +8,8 @@ require (
 	github.com/libp2p/go-libp2p-kad-dht v0.25.2
 	github.com/libp2p/go-msgio v0.3.0
 	github.com/multiformats/go-multihash v0.2.3
+	github.com/sirupsen/logrus v1.9.3
+	github.com/urfave/cli/v3 v3.0.0-alpha9.3
 )
 
 require (

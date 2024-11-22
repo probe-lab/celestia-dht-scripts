@@ -1,15 +1,38 @@
-package commons
+package dht
 
 import (
+	"fmt"
+
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/protocol"
 )
 
 type Network string
 
+func NetworkFromString(net string) Network {
+	switch net {
+	case Mainnet.String():
+		return Mainnet
+	case Mocha.String():
+		return Mocha
+	case Arabica.String():
+		return Arabica
+	case Private.String():
+		return Private
+	default:
+		return Mainnet
+	}
+}
+
+func (n Network) String() string { return string(n) }
+
+func (n Network) KadProtocol() protocol.ID {
+	celestiaProtocolBase := protocol.ID(fmt.Sprintf("/celestia/%s", n.String()))
+	return protocol.ID(fmt.Sprintf("%s/kad/1.0.0", string(celestiaProtocolBase)))
+}
+
 const (
-	// DefaultNetwork is the default network of the current build.
-	DefaultNetwork = Mainnet
 	// Arabica testnet. See: celestiaorg/networks.
 	Arabica Network = "arabica-11"
 	// Mocha testnet. See: celestiaorg/networks.
@@ -25,9 +48,10 @@ type NodeType string
 func (n NodeType) String() string { return string(n) }
 
 const (
-	DefaultNodeType          = ArchivalNode
-	ArchivalNode    NodeType = "archival"
-	FullNode        NodeType = "full"
+	NsFull           NodeType = "/full/v0.1.0"
+	NsArchival       NodeType = "/archival/v0.1.0"
+	NsLegacyArchival NodeType = "archival"
+	NsLegacyFull     NodeType = "full"
 )
 
 // NOTE: Every time we add a new long-running network, its bootstrap peers have to be added here.
