@@ -1,4 +1,4 @@
-package base_crawler
+package dht
 
 import (
 	"sync"
@@ -38,7 +38,6 @@ func (r *CrawlResults) addAgentVersion(av string) {
 	} else {
 		r.agentVersionDist[av]++
 	}
-
 }
 
 func (r *CrawlResults) addSuccessfullPeer(p peer.ID, ai peer.AddrInfo) {
@@ -63,7 +62,6 @@ func (r *CrawlResults) addProvider(p peer.ID, ai peer.AddrInfo) {
 		// add it straight away
 		r.provPeers[p] = ai
 	}
-
 }
 
 func (r *CrawlResults) addFailedPeer(p peer.ID, ai peer.AddrInfo) {
@@ -76,7 +74,6 @@ func (r *CrawlResults) addFailedPeer(p peer.ID, ai peer.AddrInfo) {
 		// add it straight away
 		r.failedPeers[p] = ai
 	}
-
 }
 
 // retrievals

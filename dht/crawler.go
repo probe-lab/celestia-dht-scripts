@@ -1,14 +1,15 @@
-package base_crawler
+package dht
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p-kad-dht/crawler"
 	pb "github.com/libp2p/go-libp2p-kad-dht/pb"
 	mh "github.com/multiformats/go-multihash"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -64,7 +65,8 @@ func (c *BaseCrawler) Run(ctx context.Context, startingNodes []*peer.AddrInfo, r
 		}
 		c.results.addAgentVersion(av)
 
-		// fmt.Printf("successfull connection to %s, requesting provs for %s key\n", p.String(), recordKey)
+		log.Tracef("peer: %s | agent_version: %s\n", p.String(), av)
+
 		// on each successfull connection, request the PRs from the key
 		provs, _, err := c.pm.GetProviders(ctx, p, recordCid.Hash())
 		if err != nil {
@@ -74,13 +76,14 @@ func (c *BaseCrawler) Run(ctx context.Context, startingNodes []*peer.AddrInfo, r
 			for _, provider := range provs {
 				c.results.addProvider(provider.ID, *provider)
 			}
-			fmt.Printf("peer %s reported %d providers for %s nodes\n", p.String(), len(provs), recordKey)
+			log.Debugf("peer %s reported %d providers for %s nodes\n", p.String(), len(provs), recordKey)
 		}
 	}
 
 	// set up the handle Fail function for the crawler
 	handleFail := func(p peer.ID, err error) {
 		c.results.addFailedPeer(p, peer.AddrInfo{})
+		log.Tracef("peer: %s | agent_version: unknonw | error: %s\n", p.String(), err.Error())
 	}
 
 	c.results.initTime = time.Now()
