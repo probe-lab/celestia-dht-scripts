@@ -32,6 +32,10 @@ func (n Network) KadProtocol() protocol.ID {
 	return protocol.ID(fmt.Sprintf("%s/kad/1.0.0", string(celestiaProtocolBase)))
 }
 
+func (n Network) KadPrefix() protocol.ID {
+	return protocol.ID(fmt.Sprintf("/celestia/%s", n.String()))
+}
+
 const (
 	// Arabica testnet. See: celestiaorg/networks.
 	Arabica Network = "arabica-11"

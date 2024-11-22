@@ -9,10 +9,10 @@ BIN=./build/cnames
 .PHONY: install uninstall build clean tidy audit test docker 
 
 install:
-	$(GOCC) install $(GIT_PACKAGE)
+	$(GOCC) install ./cmd/cnames
 
 uninstall:
-	$(GOCC) clean $(GIT_PACKAGE)
+	$(GOCC) clean ./cmd/cnames
 
 build:
 	$(GOCC) get $(TARGET_PATH)

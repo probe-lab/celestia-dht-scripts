@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -24,7 +23,7 @@ var crawlConfig = dht.LookupCmdConfig{
 }
 
 var cmdCrawl = &cli.Command{
-	Name:   "scan",
+	Name:   "crawl",
 	Usage:  "estimates the uplink BW from the active list of nodes in the network",
 	Flags:  cmdCrawlFlags,
 	Action: cmdCrawlAction,
@@ -36,7 +35,7 @@ var cmdCrawlFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_NETWORK")},
 		},
-		Usage:       "TODO",
+		Usage:       "celestia network where the cname will run",
 		Value:       crawlConfig.Network,
 		Destination: &crawlConfig.Network,
 	},
@@ -45,7 +44,7 @@ var cmdCrawlFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_IS_CUSTOM")},
 		},
-		Usage:       "TODO",
+		Usage:       "is the namespace custom?",
 		Value:       crawlConfig.IsCustomNamespace,
 		Destination: &crawlConfig.IsCustomNamespace,
 	},
@@ -54,7 +53,7 @@ var cmdCrawlFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_NAMESPACE")},
 		},
-		Usage:       "TODO",
+		Usage:       "DHT key or namespace the will be searched",
 		Value:       crawlConfig.Namespace,
 		Destination: &crawlConfig.Namespace,
 	},
@@ -66,7 +65,6 @@ func cmdCrawlAction(ctx context.Context, cmd *cli.Command) error {
 		"is-custom-ns": crawlConfig.IsCustomNamespace,
 		"namespace":    crawlConfig.Namespace,
 	}).Info("starting cnames-crawl...")
-	defer log.Infof("stopped cnames-crawl")
 
 	network := dht.NetworkFromString(crawlConfig.Network)
 	kadProtocol := network.KadProtocol()
@@ -115,9 +113,9 @@ func cmdCrawlAction(ctx context.Context, cmd *cli.Command) error {
 	providers := results.GetProvPeers()
 	agentVersions := results.GetAgentDistributions()
 
-	log.Info("Found %s nodes:\n", crawlConfig.Namespace)
-	for p := range providers {
-		fmt.Println(p)
+	log.Infof("Found %s nodes:\n", crawlConfig.Namespace)
+	for idx, p := range providers {
+		log.Infof("%s -> peer_id: %s", idx, p.ID.String())
 	}
 
 	log.Infof("Summary of the crawl on %s:", network)
@@ -125,9 +123,8 @@ func cmdCrawlAction(ctx context.Context, cmd *cli.Command) error {
 	log.Infof(" - Total discovered nodes: %d", len(succPeers)+len(failedPeers))
 	log.Infof(" - Successful connected nodes: %d", len(succPeers))
 	log.Infof(" - Failed to connect nodes: %d", len(failedPeers))
-	log.Infof(" - Advertised %s nodes: %d", crawlConfig.Namespace)
-	log.Infof(" - AgentVersion distribution:", len(providers))
-
+	log.Infof(" - Advertised %s nodes: %d", crawlConfig.Namespace, len(providers))
+	log.Infof(" - AgentVersion distribution:")
 	printTable(agentVersions)
 
 	return nil
@@ -143,7 +140,7 @@ func printTable(data map[string]int) {
 	}
 
 	// Print headerd
-	log.Infof("\n%-*s | nodes\n", maxKeyLength, "agent_version")
+	log.Infof("%-*s | nodes\n", maxKeyLength, "agent_version")
 	log.Info(strings.Repeat("-", maxKeyLength+8))
 
 	// Print key-value pairs

@@ -22,8 +22,8 @@ var lookupConfig = dht.LookupCmdConfig{
 }
 
 var cmdLookup = &cli.Command{
-	Name:   "scan",
-	Usage:  "estimates the uplink BW from the active list of nodes in the network",
+	Name:   "lookup",
+	Usage:  "makes a DHT lookup for the given namespace",
 	Flags:  cmdLookupFlags,
 	Action: cmdLookupAction,
 }
@@ -34,7 +34,7 @@ var cmdLookupFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_NETWORK")},
 		},
-		Usage:       "TODO",
+		Usage:       "celestia network where the cname will run",
 		Value:       lookupConfig.Network,
 		Destination: &lookupConfig.Network,
 	},
@@ -43,7 +43,7 @@ var cmdLookupFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_IS_CUSTOM")},
 		},
-		Usage:       "TODO",
+		Usage:       "is the namespace custom?",
 		Value:       lookupConfig.IsCustomNamespace,
 		Destination: &lookupConfig.IsCustomNamespace,
 	},
@@ -52,7 +52,7 @@ var cmdLookupFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_NAMESPACE")},
 		},
-		Usage:       "TODO",
+		Usage:       "DHT key or namespace the will be searched",
 		Value:       lookupConfig.Namespace,
 		Destination: &lookupConfig.Namespace,
 	},
@@ -64,10 +64,9 @@ func cmdLookupAction(ctx context.Context, cmd *cli.Command) error {
 		"is-custom-ns": lookupConfig.IsCustomNamespace,
 		"namespace":    lookupConfig.Namespace,
 	}).Info("starting cnames-lookup...")
-	defer log.Infof("stopped cnames-lookup")
 
 	network := dht.NetworkFromString(lookupConfig.Network)
-	kadProtocol := network.KadProtocol()
+	kadProtocol := network.KadPrefix()
 
 	h, err := libp2p.New(
 		libp2p.UserAgent(dht.CustomUserAgent),
@@ -76,7 +75,7 @@ func cmdLookupAction(ctx context.Context, cmd *cli.Command) error {
 		libp2p.DisableRelay(),
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	dhtOpts := []kad.Option{
@@ -86,26 +85,32 @@ func cmdLookupAction(ctx context.Context, cmd *cli.Command) error {
 	}
 	dhtCli, err := kad.New(ctx, h, dhtOpts...)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
+	bootnodes := 0
 	for _, bootstrapper := range dht.BootstrapPeers(network) {
 		if err := h.Connect(ctx, bootstrapper); err != nil {
 			log.Warn("couldn't connect to", bootstrapper, ":", err)
+		} else {
+			bootnodes++
 		}
 	}
 
 	log.Info("HOST info:")
-	log.Info("- Peer ID:      ", h.ID())
-	log.Info("- Network:      ", network)
-	log.Info("- Protocols:    ", h.Mux().Protocols())
-	log.Info("- Agent Version:", dht.CustomUserAgent)
+	log.Info("- Peer ID:			", h.ID())
+	log.Info("- Network:			", network)
+	log.Info("- Protocols:			", h.Mux().Protocols())
+	log.Info("- Agent Version:		", dht.CustomUserAgent)
+	log.Info("- Bootnodes:			", bootnodes)
 
-	dhtCli.Bootstrap(ctx)
-
+	err = dhtCli.Bootstrap(ctx)
+	if err != nil {
+		return nil
+	}
 	time.Sleep(5 * time.Second)
 
-	log.Info("Routing table size:", dhtCli.RoutingTable().Size())
+	log.Info("- Routing table size:	", dhtCli.RoutingTable().Size())
 
 	disc := routingdisc.NewRoutingDiscovery(dhtCli)
 
@@ -120,12 +125,12 @@ func cmdLookupAction(ctx context.Context, cmd *cli.Command) error {
 	time.Sleep(5 * time.Second)
 
 	log.Info("Found peers:")
-	c := 0
+	c := 1
 	for p := range peers {
-		log.Info(p.ID)
+		log.Infof("%d -> peer_id: %s", c, p.ID.String())
 		c += 1
 	}
-	log.Info("Total peers found:", c)
+	log.Info("Total peers found:", c-1)
 
 	return nil
 }
