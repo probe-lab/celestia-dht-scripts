@@ -24,7 +24,7 @@ var crawlConfig = dht.LookupCmdConfig{
 
 var cmdCrawl = &cli.Command{
 	Name:   "crawl",
-	Usage:  "estimates the uplink BW from the active list of nodes in the network",
+	Usage:  "crawl the given Celestia network asking around for providers of the given DHT namespace",
 	Flags:  cmdCrawlFlags,
 	Action: cmdCrawlAction,
 }

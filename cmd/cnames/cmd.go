@@ -43,7 +43,7 @@ var rootFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_LOG_LEVEL")},
 		},
-		Usage:       "Sets an explicity logging level: debug, info, warn, error. Takes precedence over the verbose flag.",
+		Usage:       "sets an explicity logging level: debug, info, warn, error. Takes precedence over the verbose flag.",
 		Destination: &rootConfig.LogLevel,
 		Value:       rootConfig.LogLevel,
 		Category:    flagCategoryLogging,
@@ -53,7 +53,7 @@ var rootFlags = []cli.Flag{
 		Sources: cli.ValueSourceChain{
 			Chain: []cli.ValueSource{cli.EnvVar("CNAMES_LOG_FORMAT")},
 		},
-		Usage:       "Sets the format to output the log statements in: text, json",
+		Usage:       "sets the format to output the log statements in: text, json",
 		Destination: &rootConfig.LogFormat,
 		Value:       rootConfig.LogFormat,
 		Category:    flagCategoryLogging,
