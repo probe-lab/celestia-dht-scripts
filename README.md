@@ -30,6 +30,7 @@ USAGE:
 COMMANDS:
    lookup   TODO
    crawl    estimates the uplink BW from the active list of nodes in the network
+   key-info  show all info for the given DHT key
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -63,5 +64,22 @@ GLOBAL OPTIONS:
    --log.format value  Sets the format to output the log statements in: text, json (default: "text") [$CNAMES_LOG_FORMAT]
 ```
 
+3. `key.info`: returns all the different formatting types for a given DHT Key (CID and Hash of the CID)  
+
+```
+NAME:
+   cnames key-info - show all info for the given DHT key
+
+USAGE:
+   cnames key-info [command [command options]]
+
+OPTIONS:
+   --key value  target key
+   --help, -h   show help
+
+GLOBAL OPTIONS:
+   --log.level value   sets an explicity logging level: debug, info, warn, error. Takes precedence over the verbose flag. (default: "info") [$CNAMES_LOG_LEVEL]
+   --log.format value  sets the format to output the log statements in: text, json (default: "text") [$CNAMES_LOG_FORMAT]
+```
 
 

@@ -99,7 +99,6 @@ func rootBefore(ctx context.Context, cmd *cli.Command) (context.Context, error) 
 }
 
 func rootAfter(c context.Context, cmd *cli.Command) error {
-	log.Info("dht script successfully finished")
 	return nil
 }
 
