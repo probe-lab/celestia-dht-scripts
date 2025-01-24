@@ -33,6 +33,7 @@ var app = &cli.Command{
 	Commands: []*cli.Command{
 		cmdLookup,
 		cmdCrawl,
+		cmdDHTKeys,
 	},
 	After: rootAfter,
 }

@@ -48,7 +48,7 @@ func New(h host.Host, ptcls []protocol.ID, pm *pb.ProtocolMessenger) (*BaseCrawl
 }
 
 func (c *BaseCrawler) Run(ctx context.Context, startingNodes []*peer.AddrInfo, recordKey string) *CrawlResults {
-	recordCid, err := keyToCid(recordKey)
+	recordCid, err := KeyToCid(recordKey)
 	if err != nil {
 		return nil
 	}
@@ -101,7 +101,7 @@ func (c *BaseCrawler) Close() {
 	c.h.Close()
 }
 
-func keyToCid(ns string) (cid.Cid, error) {
+func KeyToCid(ns string) (cid.Cid, error) {
 	h, err := mh.Sum([]byte(ns), mh.SHA2_256, -1)
 	if err != nil {
 		return cid.Undef, err
